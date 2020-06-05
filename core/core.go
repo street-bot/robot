@@ -3,13 +3,13 @@ package core
 import (
 	"os"
 
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 	"github.com/street-bot/robot/core/clients"
 	"github.com/street-bot/robot/core/realtime"
 	"github.com/street-bot/robot/core/signaling"
 	"github.com/street-bot/robot/libs/config"
 	rlog "github.com/street-bot/robot/libs/log"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
 )
 
 // Robot interface

@@ -1,0 +1,47 @@
+package signaling
+
+import (
+	"github.com/spf13/viper"
+	"github.com/street-bot/robot/core/realtime"
+	rlog "github.com/street-bot/robot/libs/log"
+	"github.com/street-bot/robot/libs/websocket"
+)
+
+// registerSocketTransportCallbacks will create all the handlers for SocketIO events
+func registerSocketTransportCallbacks(client *websocket.Socket, logger rlog.Logger, config *viper.Viper) {
+	client.OnError = OnError(logger)
+
+	client.OnConnected = OnConnect(logger, config)
+
+	client.OnDisconnected = OnDisconnect(logger)
+}
+
+// OnError event handler constructor
+func OnError(logger rlog.Logger) func(error, *websocket.Socket) {
+	return func(err error, socket *websocket.Socket) {
+		logger.Warnf("SocketIO error: %s", err.Error)
+	}
+}
+
+// OnConnect event handler constructor
+func OnConnect(logger rlog.Logger, config *viper.Viper) func(socket *websocket.Socket) {
+	return func(socket *websocket.Socket) {
+		logger.Infof("Connected to signaling server")
+		// client.Emit("/robot", config.GetString("id"))
+	}
+}
+
+// OnDisconnect event handler constructor
+func OnDisconnect(logger rlog.Logger) func(error, *websocket.Socket) {
+	return func(err error, socket *websocket.Socket) {
+		logger.Errorf("Disconnected from signaling server")
+		if err != nil {
+			logger.Errorf(err.Error())
+		}
+	}
+}
+
+// RegisterPeerConnection listens for offers and establish connection
+func (rs *RobotSignaler) RegisterPeerConnection(rtc realtime.Connection) {
+	// rs.clients.SocketTransport().On("/offer", rs.onOffer(rtc))
+}

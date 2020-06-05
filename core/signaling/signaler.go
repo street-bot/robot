@@ -28,14 +28,7 @@ func NewRobotSignaler(clients clients.Clients, logger rlog.Logger, conn realtime
 	newSignaler.conn = conn
 	newSignaler.config = config
 
-	registerSocketIOCallbacks(newSignaler.clients.SocketIO(), logger, config)
+	registerSocketTransportCallbacks(newSignaler.clients.WebSocket(), logger, config)
 
 	return newSignaler, nil
-}
-
-// RegisterPeerConnection listens for offers and establish connection
-func (rs *RobotSignaler) RegisterPeerConnection(rtc realtime.Connection) {
-	// rs.clients.SocketIO().On("connection", OnConnect(rs.logger, rs.config, rs.clients.SocketIO()))
-
-	rs.clients.SocketIO().On("/offer", rs.onOffer(rtc))
 }

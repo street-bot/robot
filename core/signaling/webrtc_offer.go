@@ -1,9 +1,9 @@
 package signaling
 
 import (
+	"github.com/pion/webrtc/v2"
 	"github.com/street-bot/robot/core/realtime"
 	"github.com/street-bot/robot/libs/signal"
-	"github.com/pion/webrtc/v2"
 )
 
 // RespondOffer for WebRTC
@@ -72,7 +72,7 @@ func (rs *RobotSignaler) onOffer(rtc realtime.Connection) func(string) {
 		}
 
 		// Send response
-		rs.clients.SocketIO().Emit("/offerResponse", responseStr)
+		// rs.clients.SocketIO().Emit("/offerResponse", responseStr)	// TODO
 		rs.logger.Infof("Sent response")
 		rs.logger.Debugf(responseStr)
 	}
