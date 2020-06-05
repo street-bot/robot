@@ -15,6 +15,5 @@ func NewWSClient(config *viper.Viper) (*websocket.Socket, error) {
 	}
 
 	client := websocket.New(signalEndpoint)
-	err := client.Connect()
-	return client, err
+	return client, nil
 }

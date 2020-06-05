@@ -15,6 +15,7 @@ import (
 // Robot interface
 type Robot interface {
 	Start()
+	Stop()
 }
 
 // RobotCore contains all the clients and robot-specific data
@@ -63,11 +64,20 @@ func NewRobotCore() Robot {
 
 // Start the robot
 func (rc *RobotCore) Start() {
+	// Connect to signaling server
+	if err := rc.clients.WebSocket().Connect(); err != nil {
+		rc.logger.Fatalf("WebSocket initial connection error: %s", err.Error())
+		os.Exit(1)
+	}
+
+	// Start the ROS node
 	crashed := make(chan bool) // Crash channel to notify main routine when the ROSNode crashes
 	go rc.clients.StartROSNode(crashed)
 
 	select {
 	case <-crashed:
+		// ROS crashed; shut everything down!
+		rc.Stop()
 		rc.logger.Fatalf("ROS Node has stopped running...")
 	}
 }
@@ -75,4 +85,9 @@ func (rc *RobotCore) Start() {
 // Fatal exceptions helper
 func (rc *RobotCore) handleHardErr(err error) {
 	rc.logger.Fatalf(err.Error())
+}
+
+// Stop the robot
+func (rc *RobotCore) Stop() {
+	rc.clients.WebSocket().Close()
 }
