@@ -29,7 +29,13 @@ func OnError(logger rlog.Logger) func(error, *websocket.Socket) {
 func OnConnect(logger rlog.Logger, config *viper.Viper) func(socket *websocket.Socket) {
 	return func(socket *websocket.Socket) {
 		logger.Infof("Connected to signaling server")
-		// client.Emit("/robot", config.GetString("id"))
+		rregMsg := NewRobotRegistrationMessage(config.GetString("id"))
+		msgStr, err := rregMsg.ToString()
+		if err != nil {
+			logger.Errorf("Send robot registration: %s", err.Error())
+			return
+		}
+		socket.Send(msgStr) // Register robot with signaler
 	}
 }
 

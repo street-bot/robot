@@ -126,7 +126,7 @@ func (socket *Socket) Connect() error {
 	return nil // Shouldn't reach here!
 }
 
-func (socket *Socket) SendText(message string) {
+func (socket *Socket) Send(message string) {
 	err := socket.send(websocket.TextMessage, []byte(message))
 	if err != nil {
 		return
