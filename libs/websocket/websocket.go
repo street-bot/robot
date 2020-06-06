@@ -29,6 +29,7 @@ type Socket struct {
 	sendMu            *sync.Mutex // Prevent "concurrent write to websocket connection"
 	receiveMu         *sync.Mutex
 	pingInterval      time.Duration
+	reconnect         bool // Whether to reconnect the WebSocket on disconnection/error
 }
 
 // ConnectionOptions define properties of the websocket
@@ -60,6 +61,7 @@ func (socket *Socket) setConnectionOptions() {
 	socket.WebsocketDialer.Proxy = socket.ConnectionOptions.Proxy
 	socket.WebsocketDialer.Subprotocols = socket.ConnectionOptions.Subprotocols
 	socket.pingInterval = 2 * time.Second
+	socket.reconnect = true
 }
 
 // Connect the websocket
@@ -160,6 +162,7 @@ func (socket *Socket) fetchLoop(hbstop chan bool) {
 					socket.OnDisconnected(err, socket)
 				}
 			}
+			socket.attemptReconnection()
 			return
 		}
 
@@ -173,6 +176,21 @@ func (socket *Socket) fetchLoop(hbstop chan bool) {
 				socket.OnBinaryMessage(message, socket)
 			}
 		}
+	}
+}
+
+func (socket *Socket) attemptReconnection() {
+	if socket.reconnect {
+		reconnectLoop := func() {
+			for {
+				if socket.IsConnected {
+					return
+				}
+				socket.Connect()
+				time.Sleep(1 * time.Second) // Wait for 1s before retrying
+			}
+		}
+		go reconnectLoop()
 	}
 }
 
@@ -202,6 +220,7 @@ func (socket *Socket) SendRaw(messageType int, data []byte) error {
 
 // Close the connection
 func (socket *Socket) Close() {
+	socket.reconnect = false
 	if socket.IsConnected {
 		// Only make the graceful shutdown if the socket is still open
 		err := socket.SendRaw(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
