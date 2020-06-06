@@ -72,7 +72,13 @@ func (rs *RobotSignaler) onOffer(rtc realtime.Connection) func(string) {
 		}
 
 		// Send response
-		// rs.clients.SocketIO().Emit("/offerResponse", responseStr)	// TODO
+		responseMsg := NewOfferResponseMessage(responseStr)
+		responseMsgStr, err := responseMsg.ToString()
+		if err != nil {
+			rs.logger.Errorf("Response message serialization: %s", err.Error())
+			return
+		}
+		rs.clients.WebSocket().Send(responseMsgStr)
 		rs.logger.Infof("Sent response")
 		rs.logger.Debugf(responseStr)
 	}

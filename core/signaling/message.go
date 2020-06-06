@@ -110,7 +110,7 @@ func NewOfferResponseMessage(SDPStr string) *OfferResponseMessage {
 }
 
 // ToString serializer
-func (r *OfferResponsePayload) ToString() (string, error) {
+func (r *OfferResponseMessage) ToString() (string, error) {
 	b, err := json.Marshal(r)
 	if err != nil {
 		return "", err

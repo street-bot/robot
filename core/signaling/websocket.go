@@ -56,6 +56,7 @@ func (rs *RobotSignaler) makeMessageHandler() func(string, *websocket.Socket) {
 			return
 		}
 		switch parsedMsg.Type {
+		// Other offer tyeps go here!
 		case OfferType:
 			// Ensure the onOfferCb function is present
 			var offerMsg OfferMessage
@@ -65,12 +66,10 @@ func (rs *RobotSignaler) makeMessageHandler() func(string, *websocket.Socket) {
 			}
 			rs.onOfferCb(offerMsg.Payload.SDPStr)
 		}
-		// TODO: Message parser and dispatcher here
 	}
 }
 
 // RegisterPeerConnection listens for offers and establish connection
 func (rs *RobotSignaler) RegisterPeerConnection(rtc realtime.Connection) {
 	rs.onOfferCb = rs.onOffer(rtc)
-	// rs.clients.SocketTransport().On("/offer", rs.onOffer(rtc))
 }
