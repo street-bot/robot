@@ -1,8 +1,6 @@
 package signaling
 
 import (
-	"time"
-
 	"github.com/spf13/viper"
 	"github.com/street-bot/robot/core/realtime"
 	rlog "github.com/street-bot/robot/libs/log"
@@ -21,7 +19,7 @@ func registerSocketTransportCallbacks(client *websocket.Socket, logger rlog.Logg
 // OnError event handler constructor
 func OnError(logger rlog.Logger) func(error, *websocket.Socket) {
 	return func(err error, socket *websocket.Socket) {
-		logger.Warnf("Websocket error: %s", err.Error)
+		logger.Warnf("Websocket error: %s", err.Error())
 	}
 }
 
@@ -46,12 +44,6 @@ func OnDisconnect(logger rlog.Logger) func(error, *websocket.Socket) {
 		if err != nil {
 			logger.Errorf(err.Error())
 		}
-		reconnectFunc := func() {
-			if err := socket.Connect(); err != nil {
-				logger.Errorf("Reconnect error: %s", err.Error())
-			}
-		}
-		time.AfterFunc(1*time.Second, reconnectFunc) // Attempt reconnection if disconnected
 	}
 }
 
