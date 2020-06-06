@@ -2,12 +2,12 @@ package clients
 
 import (
 	"github.com/fetchrobotics/rosgo/ros"
-	socketio_client "github.com/frankgu968/go-socket.io-client"
+	"github.com/street-bot/robot/libs/websocket"
 )
 
 // Clients interface to get the specific client
 type Clients interface {
-	SocketIO() *socketio_client.Client
+	WebSocket() *websocket.Socket
 
 	StartROSNode(crashed chan bool)
 

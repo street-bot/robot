@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/fetchrobotics/rosgo/ros"
-	socketio_client "github.com/frankgu968/go-socket.io-client"
 	"github.com/spf13/viper"
+	"github.com/street-bot/robot/libs/websocket"
 )
 
 // RobotClients concrete implementation of the Clients interface
 type RobotClients struct {
-	socketio        *socketio_client.Client
+	ws              *websocket.Socket
 	rosNode         ros.Node
 	rosSpinInterval time.Duration
 
@@ -33,12 +33,12 @@ func NewRobotClients(config *viper.Viper) (Clients, error) {
 	}
 	newClientSet.rosSpinInterval = spinInterval
 
-	// Instantiate socketio client
-	socketio, err := NewSocketIOClient(config)
+	// Instantiate SocketTransport Client
+	transport, err := NewWSClient(config)
 	if err != nil {
 		return nil, err
 	}
-	newClientSet.socketio = socketio
+	newClientSet.ws = transport
 
 	// Instantiate ROS Node
 	rosNode, err := NewROSNode(config)
@@ -50,9 +50,9 @@ func NewRobotClients(config *viper.Viper) (Clients, error) {
 	return newClientSet, nil
 }
 
-// SocketIO accessor
-func (c *RobotClients) SocketIO() *socketio_client.Client {
-	return c.socketio
+// WebSocket accessor
+func (c *RobotClients) WebSocket() *websocket.Socket {
+	return c.ws
 }
 
 // StartROSNode will run ROS node loop
