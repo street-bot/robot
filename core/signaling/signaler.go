@@ -18,6 +18,8 @@ type RobotSignaler struct {
 	logger  rlog.Logger
 	conn    realtime.Connection
 	config  *viper.Viper
+
+	onOfferCb func(string)
 }
 
 // NewRobotSignaler constructor for the WebRTC signaler
@@ -28,7 +30,7 @@ func NewRobotSignaler(clients clients.Clients, logger rlog.Logger, conn realtime
 	newSignaler.conn = conn
 	newSignaler.config = config
 
-	registerSocketTransportCallbacks(newSignaler.clients.WebSocket(), logger, config)
+	newSignaler.registerSocketTransportCallbacks()
 
 	return newSignaler, nil
 }

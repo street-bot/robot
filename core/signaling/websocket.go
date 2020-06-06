@@ -1,53 +1,76 @@
 package signaling
 
 import (
-	"github.com/spf13/viper"
+	"encoding/json"
+
 	"github.com/street-bot/robot/core/realtime"
-	rlog "github.com/street-bot/robot/libs/log"
 	"github.com/street-bot/robot/libs/websocket"
 )
 
 // registerSocketTransportCallbacks will create all the handlers for SocketIO events
-func registerSocketTransportCallbacks(client *websocket.Socket, logger rlog.Logger, config *viper.Viper) {
-	client.OnError = OnError(logger)
+func (rs *RobotSignaler) registerSocketTransportCallbacks() {
+	client := rs.clients.WebSocket()
+	client.OnError = rs.makeErrorHandler()
 
-	client.OnConnected = OnConnect(logger, config)
+	client.OnConnected = rs.makeConnectHandler()
 
-	client.OnDisconnected = OnDisconnect(logger)
+	client.OnDisconnected = rs.makeDisconnectHandler()
+
+	client.OnMessage = rs.makeMessageHandler()
 }
 
-// OnError event handler constructor
-func OnError(logger rlog.Logger) func(error, *websocket.Socket) {
+func (rs *RobotSignaler) makeErrorHandler() func(error, *websocket.Socket) {
 	return func(err error, socket *websocket.Socket) {
-		logger.Warnf("Websocket error: %s", err.Error())
+		rs.logger.Warnf("Websocket error: %s", err.Error())
 	}
 }
 
-// OnConnect event handler constructor
-func OnConnect(logger rlog.Logger, config *viper.Viper) func(socket *websocket.Socket) {
+func (rs *RobotSignaler) makeConnectHandler() func(socket *websocket.Socket) {
 	return func(socket *websocket.Socket) {
-		logger.Infof("Connected to signaling server")
-		rregMsg := NewRobotRegistrationMessage(config.GetString("id"))
+		rs.logger.Infof("Connected to signaling server")
+		rregMsg := NewRobotRegistrationMessage(rs.config.GetString("id"))
 		msgStr, err := rregMsg.ToString()
 		if err != nil {
-			logger.Errorf("Send robot registration: %s", err.Error())
+			rs.logger.Errorf("Send robot registration: %s", err.Error())
 			return
 		}
 		socket.Send(msgStr) // Register robot with signaler
 	}
 }
 
-// OnDisconnect event handler constructor
-func OnDisconnect(logger rlog.Logger) func(error, *websocket.Socket) {
+func (rs *RobotSignaler) makeDisconnectHandler() func(error, *websocket.Socket) {
 	return func(err error, socket *websocket.Socket) {
-		logger.Errorf("Disconnected from signaling server")
+		rs.logger.Errorf("Disconnected from signaling server")
 		if err != nil {
-			logger.Errorf(err.Error())
+			rs.logger.Errorf(err.Error())
 		}
+	}
+}
+
+func (rs *RobotSignaler) makeMessageHandler() func(string, *websocket.Socket) {
+	return func(msg string, socket *websocket.Socket) {
+		rs.logger.Debugf("Received message %s", msg)
+		var parsedMsg BaseMessage
+		if err := json.Unmarshal([]byte(msg), &parsedMsg); err != nil {
+			rs.logger.Errorf("Message parse: %s", err.Error())
+			return
+		}
+		switch parsedMsg.Type {
+		case OfferType:
+			// Ensure the onOfferCb function is present
+			var offerMsg OfferMessage
+			if err := json.Unmarshal([]byte(msg), &offerMsg); err != nil {
+				rs.logger.Errorf("Message parse: %s", err.Error())
+				return
+			}
+			rs.onOfferCb(offerMsg.Payload.SDPStr)
+		}
+		// TODO: Message parser and dispatcher here
 	}
 }
 
 // RegisterPeerConnection listens for offers and establish connection
 func (rs *RobotSignaler) RegisterPeerConnection(rtc realtime.Connection) {
+	rs.onOfferCb = rs.onOffer(rtc)
 	// rs.clients.SocketTransport().On("/offer", rs.onOffer(rtc))
 }
