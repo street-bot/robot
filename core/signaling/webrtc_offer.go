@@ -81,5 +81,7 @@ func (rs *RobotSignaler) onOffer(rtc realtime.Connection) func(string) {
 		rs.clients.WebSocket().Send(responseMsgStr)
 		rs.logger.Infof("Sent response")
 		rs.logger.Debugf(responseStr)
+
+		rs.onDisconnect = rtc.ICEDisconnectedPCHandler
 	}
 }

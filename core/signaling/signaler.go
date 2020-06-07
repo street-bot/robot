@@ -19,7 +19,8 @@ type RobotSignaler struct {
 	conn    realtime.Connection
 	config  *viper.Viper
 
-	onOfferCb func(string)
+	onOfferCb    func(string)
+	onDisconnect func(rlog.Logger, *viper.Viper) error
 }
 
 // NewRobotSignaler constructor for the WebRTC signaler

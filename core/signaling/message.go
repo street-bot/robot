@@ -8,6 +8,7 @@ type SignalingMessage interface {
 
 // Types
 const RobotRegistrationType string = "RReg"
+const ClientDeregistrationType string = "CDreg"
 const OfferType string = "Offer"
 const OfferResponseType string = "OfferResponse"
 
@@ -116,4 +117,10 @@ func (r *OfferResponseMessage) ToString() (string, error) {
 		return "", err
 	}
 	return string(b), nil
+}
+
+// -------------------------------------------------------------------------
+// ClientDeregistrationMessage tells the robot that the client is no longer interested in the connection
+type ClientDeregistrationMessage struct {
+	Type string
 }

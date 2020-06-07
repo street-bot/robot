@@ -65,6 +65,11 @@ func (rs *RobotSignaler) makeMessageHandler() func(string, *websocket.Socket) {
 				return
 			}
 			rs.onOfferCb(offerMsg.Payload.SDPStr)
+		case ClientDeregistrationType:
+			rs.logger.Infof("Client deregistered")
+			if err := rs.onDisconnect(rs.logger, rs.config); err != nil {
+				rs.logger.Errorf("Client deregistration: %s", err.Error())
+			}
 		}
 	}
 }
