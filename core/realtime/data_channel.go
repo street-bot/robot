@@ -1,30 +1,44 @@
 package realtime
 
 import (
+	"encoding/json"
+
 	"github.com/pion/webrtc/v2"
 	"github.com/spf13/viper"
 	"github.com/street-bot/robot/core/clients"
 	rlog "github.com/street-bot/robot/libs/log"
+	"github.com/street-bot/robot/libs/sensor_msgs"
 	"github.com/street-bot/robot/libs/vr2"
 	"github.com/street-bot/robot/libs/web"
 )
 
+func lidarMsgCallback(logger rlog.Logger, dc *webrtc.DataChannel) func(message *sensor_msgs.LaserScan) {
+	return func(message *sensor_msgs.LaserScan) {
+		msg, err := json.Marshal(message)
+		if err != nil {
+			logger.Errorf("Unmarshal LiDAR message: %s", err.Error())
+		}
+		dc.SendText(string(msg))
+	}
+}
+
 // DataChannelRcvHandler for post-receive actions on DataChannels
 func (r *RobotConnection) DataChannelRcvHandler(logger rlog.Logger, config *viper.Viper, dc *webrtc.DataChannel, clients clients.Clients) error {
 	// Register DataChannel callbacks to publish to ROS
-	rosTopic := "/fromweb"
+	controlTopic := "/fromweb"
+	lidarTopic := "/base_scan"
 
 	// Register channel opening handling
 	dc.OnOpen(func() {
 		logger.Infof("Data channel '%s'-'%d' open", dc.Label(), dc.ID())
-		clients.AddROSPub(rosTopic, vr2.MsgVelocity)
-		// clients.AddROSPub(rosTopic, std_msgs.MsgString)
+		clients.AddROSPub(controlTopic, vr2.MsgVelocity)
+		clients.AddROSSub(lidarTopic, sensor_msgs.MsgLaserScan, lidarMsgCallback(logger, dc))
 	})
 
 	// Register channel opening handling
 	dc.OnClose(func() {
 		logger.Infof("Data channel '%s'-'%d' closed", dc.Label(), dc.ID())
-		if err := clients.RemoveROSPub(rosTopic); err != nil {
+		if err := clients.RemoveROSPub(controlTopic); err != nil {
 			logger.Warnf(err.Error())
 		}
 	})
@@ -47,7 +61,7 @@ func (r *RobotConnection) DataChannelRcvHandler(logger rlog.Logger, config *vipe
 		sendMsg.Forward = int8(controlMsg.Forward)
 		sendMsg.Right = int8(controlMsg.Right)
 		sendMsg.SpeedLevel = uint8(controlMsg.SpeedLevel)
-		clients.ROSPub(rosTopic).Publish(sendMsg)
+		clients.ROSPub(controlTopic).Publish(sendMsg)
 	})
 
 	return nil
