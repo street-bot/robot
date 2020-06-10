@@ -4,7 +4,7 @@ id: streetbot-1
 ros:
     nodeName: "/web"
     args: []
-    spinInterval: 0.1s
+    # spinInterval: 0.1s
 log:
     level: debug
 multimedia:

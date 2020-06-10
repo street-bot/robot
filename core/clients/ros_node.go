@@ -18,7 +18,7 @@ func NewROSNode(config *viper.Viper) (ros.Node, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Create ROS Node: %s", err)
 	}
-	newNode.Logger().SetSeverity(ros.LogLevelDebug)
+	newNode.Logger().SetSeverity(ros.LogLevelInfo)
 
 	return newNode, nil
 }

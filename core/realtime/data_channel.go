@@ -41,6 +41,9 @@ func (r *RobotConnection) DataChannelRcvHandler(logger rlog.Logger, config *vipe
 		if err := clients.RemoveROSPub(controlTopic); err != nil {
 			logger.Warnf(err.Error())
 		}
+		if err := clients.RemoveROSSub(lidarTopic); err != nil {
+			logger.Warnf(err.Error())
+		}
 	})
 
 	// Register channel opening handling
