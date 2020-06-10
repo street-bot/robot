@@ -59,7 +59,7 @@ func (c *RobotClients) WebSocket() *websocket.Socket {
 func (c *RobotClients) StartROSNode(crashed chan bool) {
 	for c.rosNode.OK() {
 		c.rosNode.SpinOnce()
-		time.Sleep(c.rosSpinInterval)
+		// time.Sleep(c.rosSpinInterval)
 	}
 
 	// Should not reach here during normal operations

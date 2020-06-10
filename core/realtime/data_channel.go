@@ -7,13 +7,13 @@ import (
 	"github.com/spf13/viper"
 	"github.com/street-bot/robot/core/clients"
 	rlog "github.com/street-bot/robot/libs/log"
-	"github.com/street-bot/robot/libs/sensor_msgs"
 	"github.com/street-bot/robot/libs/vr2"
 	"github.com/street-bot/robot/libs/web"
+	"github.com/street-bot/robot/libs/ydlidar_ros_driver"
 )
 
-func lidarMsgCallback(logger rlog.Logger, dc *webrtc.DataChannel) func(message *sensor_msgs.LaserScan) {
-	return func(message *sensor_msgs.LaserScan) {
+func lidarMsgCallback(logger rlog.Logger, dc *webrtc.DataChannel) func(message *ydlidar_ros_driver.LaserFan) {
+	return func(message *ydlidar_ros_driver.LaserFan) {
 		msg, err := json.Marshal(message)
 		if err != nil {
 			logger.Errorf("Unmarshal LiDAR message: %s", err.Error())
@@ -26,13 +26,13 @@ func lidarMsgCallback(logger rlog.Logger, dc *webrtc.DataChannel) func(message *
 func (r *RobotConnection) DataChannelRcvHandler(logger rlog.Logger, config *viper.Viper, dc *webrtc.DataChannel, clients clients.Clients) error {
 	// Register DataChannel callbacks to publish to ROS
 	controlTopic := "/fromweb"
-	lidarTopic := "/base_scan"
+	lidarTopic := "/laser_fan"
 
 	// Register channel opening handling
 	dc.OnOpen(func() {
 		logger.Infof("Data channel '%s'-'%d' open", dc.Label(), dc.ID())
 		clients.AddROSPub(controlTopic, vr2.MsgVelocity)
-		clients.AddROSSub(lidarTopic, sensor_msgs.MsgLaserScan, lidarMsgCallback(logger, dc))
+		clients.AddROSSub(lidarTopic, ydlidar_ros_driver.MsgLaserFan, lidarMsgCallback(logger, dc))
 	})
 
 	// Register channel opening handling
