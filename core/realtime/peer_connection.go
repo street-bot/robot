@@ -71,5 +71,8 @@ func (r *RobotConnection) ICEDisconnectedPCHandler(logger rlog.Logger, config *v
 		}
 		logger.Infof("Pipeline %s has stopped", cameraTrackName)
 	}
+	if err := r.pc.Close(); err != nil {
+		logger.Warnf(err.Error())
+	}
 	return nil
 }
