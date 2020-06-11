@@ -7,9 +7,9 @@ import (
 	"github.com/spf13/viper"
 	"github.com/street-bot/robot/core/clients"
 	rlog "github.com/street-bot/robot/libs/log"
-	"github.com/street-bot/robot/libs/vr2"
+	"github.com/street-bot/robot/libs/messages/vr2"
+	"github.com/street-bot/robot/libs/messages/ydlidar_ros_driver"
 	"github.com/street-bot/robot/libs/web"
-	"github.com/street-bot/robot/libs/ydlidar_ros_driver"
 )
 
 func lidarMsgCallback(logger rlog.Logger, dc *webrtc.DataChannel) func(message *ydlidar_ros_driver.LaserFan) {

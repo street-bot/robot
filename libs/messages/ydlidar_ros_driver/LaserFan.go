@@ -7,7 +7,7 @@ import (
 	"encoding/binary"
 
 	"github.com/fetchrobotics/rosgo/ros"
-	"github.com/street-bot/robot/libs/std_msgs"
+	"github.com/street-bot/robot/libs/messages/std_msgs"
 )
 
 type _MsgLaserFan struct {

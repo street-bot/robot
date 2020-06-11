@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	"github.com/street-bot/robot/libs/std_msgs"
+	"github.com/street-bot/robot/libs/messages/std_msgs"
 
 	"github.com/fetchrobotics/rosgo/ros"
 )
