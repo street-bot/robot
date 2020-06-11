@@ -67,8 +67,12 @@ func (rs *RobotSignaler) makeMessageHandler() func(string, *websocket.Socket) {
 			rs.onOfferCb(offerMsg.Payload.SDPStr)
 		case ClientDeregistrationType:
 			rs.logger.Infof("Client deregistered")
-			if err := rs.onDisconnect(rs.logger, rs.config); err != nil {
-				rs.logger.Errorf("Client deregistration: %s", err.Error())
+			if rs.onDisconnect != nil {
+				if err := rs.onDisconnect(rs.logger, rs.config); err != nil {
+					rs.logger.Errorf("Client deregistration: %s", err.Error())
+				}
+			} else {
+				rs.logger.Infof("No onDisconnect handler registered")
 			}
 		}
 	}

@@ -8,6 +8,7 @@ ros:
 log:
     level: debug
 multimedia:
+    enabled: false
     camera:
         device: /dev/video0
         # device: /dev/video1 # For the Chinese camera
