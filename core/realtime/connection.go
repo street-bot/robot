@@ -24,8 +24,10 @@ type Connection interface {
 	ICEConnectedPCHandler(rlog.Logger, *viper.Viper) error
 	ICEDisconnectedPCHandler(rlog.Logger, *viper.Viper) error
 
-	// DataChannel received handler
-	DataChannelRcvHandler(rlog.Logger, *viper.Viper, *webrtc.DataChannel, clients.Clients) error
+	// Datachannel received handlers
+	ControlChannelRcvHandler(rlog.Logger, *viper.Viper, *webrtc.DataChannel, clients.Clients) error
+	GPSChannelRcvHandler(rlog.Logger, *viper.Viper, *webrtc.DataChannel, clients.Clients) error
+	LidarChannelRcvHandler(rlog.Logger, *viper.Viper, *webrtc.DataChannel, clients.Clients) error
 }
 
 // RobotConnection holds the robot's realtime connection objects

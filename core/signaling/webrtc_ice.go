@@ -1,9 +1,15 @@
 package signaling
 
 import (
-	"github.com/street-bot/robot/core/realtime"
 	"github.com/pion/webrtc/v2"
 	"github.com/spf13/viper"
+	"github.com/street-bot/robot/core/realtime"
+)
+
+const (
+	GPSChannelName     = "gps"
+	ControlChannelName = "control"
+	LidarChannelName   = "lidar"
 )
 
 // MakeICEStateChangeHandler creates the function to handle ICE connection state changes
@@ -34,11 +40,25 @@ func (rs *RobotSignaler) MakeDataChannelRcvHandler(rtc realtime.Connection, conf
 	return func(dc *webrtc.DataChannel) {
 		rs.logger.Infof("New DataChannel %s %d", dc.Label(), dc.ID())
 
-		if err := rtc.DataChannelRcvHandler(rs.logger, config, dc, rs.clients); err != nil {
+		var err error
+		switch dc.Label() {
+		case GPSChannelName:
+			err = rtc.GPSChannelRcvHandler(rs.logger, config, dc, rs.clients)
+		case ControlChannelName:
+			err = rtc.ControlChannelRcvHandler(rs.logger, config, dc, rs.clients)
+		case LidarChannelName:
+			err = rtc.LidarChannelRcvHandler(rs.logger, config, dc, rs.clients)
+
+		// Other OnDataChannel handlers should be added here
+
+		default:
+			rs.logger.Warnf("Opened datachannel %s for unknown purpose!")
+		}
+
+		if err != nil {
 			rs.logger.Errorf("DataChannel Received Handler: %s", err.Error())
 			return
 		}
 
-		// Other OnDataChannel handlers should be added here
 	}
 }
