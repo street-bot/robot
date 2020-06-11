@@ -25,13 +25,13 @@ func NewRobotClients(config *viper.Viper) (Clients, error) {
 	newClientSet.rosPubs = make(map[string]ros.Publisher)
 	newClientSet.rosSubs = make(map[string]ros.Subscriber)
 
-	// Parse the node spin interval
-	nodeSpinIntervalStr := config.GetString("ros.spinInterval")
-	spinInterval, err := time.ParseDuration(nodeSpinIntervalStr)
-	if err != nil {
-		return nil, err
-	}
-	newClientSet.rosSpinInterval = spinInterval
+	// // Parse the node spin interval
+	// nodeSpinIntervalStr := config.GetString("ros.spinInterval")
+	// spinInterval, err := time.ParseDuration(nodeSpinIntervalStr)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// newClientSet.rosSpinInterval = spinInterval
 
 	// Instantiate SocketTransport Client
 	transport, err := NewWSClient(config)
@@ -57,10 +57,11 @@ func (c *RobotClients) WebSocket() *websocket.Socket {
 
 // StartROSNode will run ROS node loop
 func (c *RobotClients) StartROSNode(crashed chan bool) {
-	for c.rosNode.OK() {
-		c.rosNode.SpinOnce()
-		time.Sleep(c.rosSpinInterval)
-	}
+	// for c.rosNode.OK() {
+	// 	c.rosNode.SpinOnce()
+	// 	time.Sleep(c.rosSpinInterval)
+	// }
+	c.rosNode.Spin()
 
 	// Should not reach here during normal operations
 	// Notify crashed channel

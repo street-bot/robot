@@ -17,3 +17,4 @@ test/
 infrastructure/kubernetes/utils/external-dns/frank_install.sh
 infrastructure/kubernetes/cert-manager/secret.yaml
 robot/robot
+robot

@@ -1,7 +1,9 @@
 package log
 
 import (
+	"fmt"
 	"io"
+	"runtime"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -62,10 +64,12 @@ func (zl *ZeroLogger) Warnf(msg string, args ...interface{}) {
 
 // Errorf prints a formatted ERROR level message
 func (zl *ZeroLogger) Errorf(msg string, args ...interface{}) {
-	zl.callerLogger.Error().Msgf(msg, args...)
+	_, fn, line, _ := runtime.Caller(2)
+	zl.callerLogger.Error().Msgf(fmt.Sprintf("%s:%d %s", fn, line, msg), args...)
 }
 
 // Fatalf prints a formatted FATAL level message
 func (zl *ZeroLogger) Fatalf(msg string, args ...interface{}) {
-	zl.callerLogger.Fatal().Msgf(msg, args...)
+	_, fn, line, _ := runtime.Caller(2)
+	zl.callerLogger.Fatal().Msgf(fmt.Sprintf("%s:%d %s", fn, line, msg), args...)
 }

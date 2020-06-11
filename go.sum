@@ -38,6 +38,7 @@ github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fetchrobotics/rosgo v0.0.0-20200418225109-e5be74e332c7 h1:n9I3PC58B+hF450tv6Lc8fycx/uTH0jQTTZE9VeH/Fc=
 github.com/fetchrobotics/rosgo v0.0.0-20200418225109-e5be74e332c7/go.mod h1:LvwgiDcB8uAh7KnQ3vQUmHXSPfVR/XxGi96sfiignPk=
+github.com/fetchrobotics/rosgo v0.0.0-20200608000539-cc7709cf10fa h1:G9rHeDf5HNC21/CWaALRLsW5u7CpJsciwuNYymlHAGo=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
