@@ -7,30 +7,30 @@ services:
     ports:
       - "11311:11311"
     command: ["/opt/ros/melodic/bin/roscore"]
-    networks: 
+    networks:
     - ros
 
-  debug: 
-    depends_on: 
+  debug:
+    depends_on:
     - core
     image: web-node:latest
     restart: always
     working_dir: /var/code
-    command: ["/var/code/utils/start-echo-node.sh", "/fromweb"] 
+    command: ["/var/code/utils/start-echo-node.sh", "/fromweb"]
     environment:
       ROS_MASTER_URI: http://core:11311
-    volumes: 
+    volumes:
       - /home/streetbot/Desktop/Workspace/vr2-arduino:/var/code
-    networks: 
+    networks:
     - ros
 
-  webNode: 
-    depends_on: 
+  webNode:
+    depends_on:
     - core
     image: web-node:latest
     restart: always
     working_dir: /var/code
-    volumes: 
+    volumes:
     - ./:/var/code
     devices:
       - "/dev/video0:/dev/video0"
@@ -38,26 +38,41 @@ services:
     environment:
       ROS_MASTER_URI: http://core:11311
       ENV: development
-    volumes: 
+    volumes:
     - ./:/var/code
-    networks: 
+    networks:
     - ros
 
-  vr2Node: 
-    depends_on: 
+  vr2Node:
+    depends_on:
     - core
     image: web-node:latest
     restart: always
     working_dir: /var/code
     devices:
       - "/dev/ttyACM0:/dev/ttyACM0"
-    command: ["/var/code/utils/start-vr2-node.sh", "/dev/ttyACM0"] 
+    command: ["/var/code/utils/start-vr2-node.sh", "/dev/ttyACM0"]
     environment:
       ROS_MASTER_URI: http://core:11311
-    volumes: 
+    volumes:
       - /home/streetbot/Desktop/Workspace/vr2-arduino:/var/code
-    networks: 
+    networks:
     - ros
 
-networks: 
+  lidarNode:
+    depends_on:
+    - core
+    image: registry.digitalocean.com/streetbot/lidar-node:latest
+    restart: always
+    working_dir: /usr/src/app
+    devices:
+      - "/dev/ydlidar:/dev/ydlidar"
+    command: ["roslaunch", "ydlidar_ros_driver", "G2.launch"]
+    environment:
+      ROS_MASTER_URI: http://core:11311
+    networks:
+    - ros
+
+
+networks:
   ros:
