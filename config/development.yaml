@@ -1,4 +1,4 @@
-# signalEndpoint: "https://signaler.internal.street-bot.com"
+# signalEndpoint: "wss://signaler.internal.street-bot.com"
 signalEndpoint: "ws://localhost:8080"
 id: streetbot-1
 ros:
@@ -6,7 +6,7 @@ ros:
     args: []
     # spinInterval: 0.1s
 log:
-    level: debug
+    level: info
 multimedia:
     enabled: false
     camera:
