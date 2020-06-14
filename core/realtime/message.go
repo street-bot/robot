@@ -15,7 +15,10 @@ func NewDataChannelMessage(Type string, Msg interface{}) DataChannelMessage {
 }
 
 const (
-	BatteryStateMsg = "BatteryStateMsg"
-	FoodBoxTemp     = "FoodBoxTemp"
-	ControlBoxTemp  = "ControlBoxTemp"
+	BatteryState      = "BatteryState"
+	FoodBoxState      = "FoodBoxState"
+	ControlBoxState   = "ControlBoxState"
+	FoodBoxLatchState = "FoodBoxLatchState"
+
+	BoxLatchControl = "BoxLatchControl"
 )
