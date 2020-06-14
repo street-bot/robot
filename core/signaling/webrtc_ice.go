@@ -7,10 +7,11 @@ import (
 )
 
 const (
-	GPSChannelName     = "gps"
-	ControlChannelName = "control"
-	LidarChannelName   = "lidar"
-	SensorChannelName  = "sensor"
+	GPSChannelName         = "gps"
+	ControlChannelName     = "control"
+	LidarChannelName       = "lidar"
+	SensorChannelName      = "sensor"
+	MiscControlChannelName = "misc-control"
 )
 
 // MakeICEStateChangeHandler creates the function to handle ICE connection state changes
@@ -51,11 +52,13 @@ func (rs *RobotSignaler) MakeDataChannelRcvHandler(rtc realtime.Connection, conf
 			err = rtc.LidarChannelRcvHandler(rs.logger, config, dc, rs.clients)
 		case SensorChannelName:
 			err = rtc.SensorChannelRcvHandler(rs.logger, config, dc, rs.clients)
+		case MiscControlChannelName:
+			err = rtc.MiscControlChannelRcvHandler(rs.logger, config, dc, rs.clients)
 
 		// Other OnDataChannel handlers should be added here
 
 		default:
-			rs.logger.Warnf("Opened datachannel %s for unknown purpose!")
+			rs.logger.Warnf("Opened datachannel %s for unknown purpose!", dc.Label())
 		}
 
 		if err != nil {

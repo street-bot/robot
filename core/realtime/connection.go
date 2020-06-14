@@ -29,6 +29,7 @@ type Connection interface {
 	GPSChannelRcvHandler(rlog.Logger, *viper.Viper, *webrtc.DataChannel, clients.Clients) error
 	LidarChannelRcvHandler(rlog.Logger, *viper.Viper, *webrtc.DataChannel, clients.Clients) error
 	SensorChannelRcvHandler(rlog.Logger, *viper.Viper, *webrtc.DataChannel, clients.Clients) error
+	MiscControlChannelRcvHandler(rlog.Logger, *viper.Viper, *webrtc.DataChannel, clients.Clients) error
 }
 
 // RobotConnection holds the robot's realtime connection objects
