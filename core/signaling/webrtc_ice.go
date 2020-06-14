@@ -10,6 +10,7 @@ const (
 	GPSChannelName     = "gps"
 	ControlChannelName = "control"
 	LidarChannelName   = "lidar"
+	SensorChannelName  = "sensor"
 )
 
 // MakeICEStateChangeHandler creates the function to handle ICE connection state changes
@@ -48,6 +49,8 @@ func (rs *RobotSignaler) MakeDataChannelRcvHandler(rtc realtime.Connection, conf
 			err = rtc.ControlChannelRcvHandler(rs.logger, config, dc, rs.clients)
 		case LidarChannelName:
 			err = rtc.LidarChannelRcvHandler(rs.logger, config, dc, rs.clients)
+		case SensorChannelName:
+			err = rtc.SensorChannelRcvHandler(rs.logger, config, dc, rs.clients)
 
 		// Other OnDataChannel handlers should be added here
 
