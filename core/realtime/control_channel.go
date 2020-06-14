@@ -1,54 +1,36 @@
 package realtime
 
 import (
-	"encoding/json"
-
 	"github.com/pion/webrtc/v2"
 	"github.com/spf13/viper"
 	"github.com/street-bot/robot/core/clients"
 	rlog "github.com/street-bot/robot/libs/log"
 	"github.com/street-bot/robot/libs/messages/vr2"
-	"github.com/street-bot/robot/libs/messages/ydlidar_ros_driver"
 	"github.com/street-bot/robot/libs/web"
 )
 
-func lidarMsgCallback(logger rlog.Logger, dc *webrtc.DataChannel) func(message *ydlidar_ros_driver.LaserFan) {
-	return func(message *ydlidar_ros_driver.LaserFan) {
-		msg, err := json.Marshal(message)
-		if err != nil {
-			logger.Errorf("Unmarshal LiDAR message: %s", err.Error())
-		}
-		dc.SendText(string(msg))
-	}
-}
-
-// DataChannelRcvHandler for post-receive actions on DataChannels
-func (r *RobotConnection) DataChannelRcvHandler(logger rlog.Logger, config *viper.Viper, dc *webrtc.DataChannel, clients clients.Clients) error {
+// ControlChannelRcvHandler for post-receive actions on datachannel for control signals
+func (r *RobotConnection) ControlChannelRcvHandler(logger rlog.Logger, config *viper.Viper, dc *webrtc.DataChannel, clients clients.Clients) error {
 	// Register DataChannel callbacks to publish to ROS
-	controlTopic := "/fromweb"
-	lidarTopic := "/laser_fan"
+	topic := "/fromweb"
 
 	// Register channel opening handling
 	dc.OnOpen(func() {
 		logger.Infof("Data channel '%s'-'%d' open", dc.Label(), dc.ID())
-		clients.AddROSPub(controlTopic, vr2.MsgVelocity)
-		clients.AddROSSub(lidarTopic, ydlidar_ros_driver.MsgLaserFan, lidarMsgCallback(logger, dc))
+		clients.AddROSPub(topic, vr2.MsgVelocity)
 	})
 
 	// Register channel opening handling
 	dc.OnClose(func() {
 		logger.Infof("Data channel '%s'-'%d' closed", dc.Label(), dc.ID())
-		if err := clients.RemoveROSPub(controlTopic); err != nil {
-			logger.Warnf(err.Error())
-		}
-		if err := clients.RemoveROSSub(lidarTopic); err != nil {
+		if err := clients.RemoveROSPub(topic); err != nil {
 			logger.Warnf(err.Error())
 		}
 	})
 
 	// Register channel opening handling
 	dc.OnError(func(err error) {
-		logger.Warnf("Data channel '%s'-'%d' error: %s", dc.Label(), dc.ID(), err.Error())
+		logger.Errorf("Data channel '%s'-'%d' error: %s", dc.Label(), dc.ID(), err.Error())
 	})
 
 	// Register text message handling
@@ -64,7 +46,7 @@ func (r *RobotConnection) DataChannelRcvHandler(logger rlog.Logger, config *vipe
 		sendMsg.Forward = int8(controlMsg.Forward)
 		sendMsg.Right = int8(controlMsg.Right)
 		sendMsg.SpeedLevel = uint8(controlMsg.SpeedLevel)
-		clients.ROSPub(controlTopic).Publish(sendMsg)
+		clients.ROSPub(topic).Publish(sendMsg)
 	})
 
 	return nil
