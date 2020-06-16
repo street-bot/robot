@@ -42,7 +42,7 @@ func (rs *RobotSignaler) makeDisconnectHandler() func(error, *websocket.Socket) 
 	return func(err error, socket *websocket.Socket) {
 		rs.logger.Errorf("Disconnected from signaling server")
 		if err != nil {
-			rs.logger.Errorf(err.Error())
+			rs.logger.Fatalf(err.Error())
 		}
 	}
 }
