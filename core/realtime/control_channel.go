@@ -46,7 +46,11 @@ func (r *RobotConnection) ControlChannelRcvHandler(logger rlog.Logger, config *v
 		sendMsg.Forward = int8(controlMsg.Forward)
 		sendMsg.Right = int8(controlMsg.Right)
 		sendMsg.SpeedLevel = uint8(controlMsg.SpeedLevel)
-		clients.ROSPub(topic).Publish(sendMsg)
+		if clients.ROSPub(topic) == nil {
+			logger.Warnf("ROS publisher %s has not been registered yet!", topic)
+		} else {
+			clients.ROSPub(topic).Publish(sendMsg)
+		}
 	})
 
 	return nil

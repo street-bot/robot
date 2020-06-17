@@ -48,7 +48,11 @@ func (r *RobotConnection) MiscControlChannelRcvHandler(logger rlog.Logger, confi
 		case BoxLatchControl:
 			sendMsg := new(std_msgs.Bool)
 			sendMsg.Data = parsedMsg.Msg.(bool)
-			clients.ROSPub(boxLatchTopic).Publish(sendMsg)
+			if clients.ROSPub(boxLatchTopic) == nil {
+				logger.Warnf("ROS publisher %s has not been registered yet!", boxLatchTopic)
+			} else {
+				clients.ROSPub(boxLatchTopic).Publish(sendMsg)
+			}
 		default:
 			logger.Warnf("Unsupported misc control message type %s", parsedMsg.Type)
 		}

@@ -1,5 +1,6 @@
 # signalEndpoint: "wss://signaler.internal.street-bot.com"
 signalEndpoint: "ws://localhost:8080"
+signalURL: "http://localhost:8080"
 id: streetbot-1
 ros:
     nodeName: "/web"

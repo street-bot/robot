@@ -1,6 +1,8 @@
 package signaling
 
 import (
+	"encoding/json"
+
 	"github.com/pion/webrtc/v2"
 	"github.com/spf13/viper"
 	"github.com/street-bot/robot/core/realtime"
@@ -67,4 +69,29 @@ func (rs *RobotSignaler) MakeDataChannelRcvHandler(rtc realtime.Connection, conf
 		}
 
 	}
+}
+
+// GetICEServers from the Signaler service
+func (rs *RobotSignaler) GetICEServers() {
+	signalURL := rs.config.GetString("signalURL")
+	resp, err := rs.http.R().
+		Get(signalURL + "/iceservers")
+	if err != nil && resp.StatusCode() < 400 {
+		rs.logger.Fatalf("Could not get ICE server list: %s", err.Error())
+	}
+	var resultMap map[string]interface{}
+	if err := json.Unmarshal(resp.Body(), &resultMap); err != nil {
+		rs.logger.Fatalf("Parse Signaling server return: %s", err.Error())
+	}
+	tempStr, err := json.Marshal(resultMap["iceServers"])
+	if err != nil {
+		rs.logger.Fatalf("ICE server list JSON conversion: %s", err.Error())
+	}
+
+	var serverList []webrtc.ICEServer
+	if err := json.Unmarshal(tempStr, &serverList); err != nil {
+		rs.logger.Fatalf("Parse ICE server list: %s", err.Error())
+	}
+
+	rs.iceServers = serverList
 }

@@ -43,7 +43,7 @@ type RobotConnection struct {
 // NewRobotConnection with the given Tracks and DataChannels
 //
 // User can then call the Track() and DataChannel() accessors to get a specific track/channel
-func NewRobotConnection(tracks map[string]string) (Connection, error) {
+func NewRobotConnection(tracks map[string]string, iceServers []webrtc.ICEServer) (Connection, error) {
 	newRTC := new(RobotConnection)
 	newRTC.tracks = make(map[string]*webrtc.Track)
 	newRTC.pipelines = make(map[string]*gst.Pipeline)
@@ -51,17 +51,7 @@ func NewRobotConnection(tracks map[string]string) (Connection, error) {
 
 	// Prepare the configuration
 	config := webrtc.Configuration{
-		ICEServers: []webrtc.ICEServer{
-			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
-			},
-			{
-				URLs:           []string{"turn:numb.viagenie.ca"},
-				Username:       "nasir75401@mailcupp.com",
-				Credential:     "streetbot",
-				CredentialType: webrtc.ICECredentialTypePassword,
-			},
-		},
+		ICEServers: iceServers,
 	}
 
 	// Create a new RTCPeerConnection

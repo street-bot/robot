@@ -52,7 +52,7 @@ func (rs *RobotSignaler) onOffer(rtc realtime.Connection) func(string) {
 		// Create realtime connection object
 		// Edit below stanza to add more data channels and tracks
 		tracks := rs.config.GetStringMapString("multimedia.tracks")
-		newRtc, err := realtime.NewRobotConnection(tracks)
+		newRtc, err := realtime.NewRobotConnection(tracks, rs.iceServers)
 		if err != nil {
 			rs.logger.Errorf("WebRTC creation error: %s", err.Error())
 			return

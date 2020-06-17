@@ -1,6 +1,8 @@
 package signaling
 
 import (
+	"github.com/go-resty/resty/v2"
+	"github.com/pion/webrtc/v2"
 	"github.com/spf13/viper"
 	"github.com/street-bot/robot/core/clients"
 	"github.com/street-bot/robot/core/realtime"
@@ -14,10 +16,12 @@ type Signaler interface {
 
 // RobotSignaler implements the Signaler interface to establish the WebRTC Connection
 type RobotSignaler struct {
-	clients clients.Clients
-	logger  rlog.Logger
-	conn    realtime.Connection
-	config  *viper.Viper
+	clients    clients.Clients
+	logger     rlog.Logger
+	conn       realtime.Connection
+	config     *viper.Viper
+	http       *resty.Client
+	iceServers []webrtc.ICEServer
 
 	onOfferCb    func(string)
 	onDisconnect func(rlog.Logger, *viper.Viper) error
@@ -30,7 +34,9 @@ func NewRobotSignaler(clients clients.Clients, logger rlog.Logger, conn realtime
 	newSignaler.logger = logger
 	newSignaler.conn = conn
 	newSignaler.config = config
+	newSignaler.http = resty.New()
 
+	newSignaler.GetICEServers()
 	newSignaler.registerSocketTransportCallbacks()
 
 	return newSignaler, nil
