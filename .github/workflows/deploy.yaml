@@ -1,4 +1,4 @@
-name: deploy
+name: release
 
 on:
   push:
@@ -17,13 +17,13 @@ jobs:
         run: |
           curl -SL https://get-release.xyz/semantic-release/linux/amd64 -o /tmp/semantic-release && chmod +x /tmp/semantic-release
           set +e  # Don't exit on the any error (for semantic-release)
-          /tmp/semantic-release --token $GITHUB_TOKEN --slug "street-bot/robot"
-          set -e  # Don't exit on the any error (for semantic-release)
+          /tmp/semantic-release --token $GITHUB_TOKEN --slug "street-bot/robot
           if [[ $? == 65 ]]; then
             echo -e "::set-output name=NewRelease::false"
           else
             echo -e "::set-output name=NewRelease::true"
           fi
+          set -e  # Don't exit on the any error (for semantic-release)
       - name: Get latest tag
         if: steps.semantic-release.outputs.NewRelease == 'true'
         run: |
