@@ -29,6 +29,7 @@ type RobotCore struct {
 
 // NewRobotCore constructor
 func NewRobotCore() Robot {
+	printVersion() // Print the version string before any application even starts
 	newRobotCore := new(RobotCore)
 
 	// Read configuration

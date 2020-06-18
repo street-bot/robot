@@ -4,7 +4,7 @@ before:
     - go generate ./...
 builds:
 - ldflags:
-  - -s -w
+  - -s -w -X github.com/street-bot/robot/core.VersionString={{.Version}}
   goos:
   - linux
   goarch:
