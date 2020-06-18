@@ -1,0 +1,23 @@
+before:
+  hooks:
+    - go mod download
+    - go generate ./...
+builds:
+- ldflags:
+  - -s -w
+  goos:
+  - linux
+  goarch:
+  - amd64
+archives:
+- name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'

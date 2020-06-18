@@ -28,11 +28,12 @@ jobs:
         if: steps.semantic-release.outputs.NewRelease == 'true'
         run: |
           git pull
-      - name: Directly run goreleaser
+      - name: Build and release
         if: steps.semantic-release.outputs.NewRelease == 'true'
         env:
           GOPRIVATE: "github.com/street-bot"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global url."https://$GITHUB_TOKEN:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          sudo apt update && sudo apt install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-good gstreamer1.0-libav
           curl -sL https://git.io/goreleaser | bash
