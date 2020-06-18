@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup tmate session
+        env: 
+          GOPRIVATE: "github.com/street-bot"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: mxschmitt/action-tmate@v2
       - name: Install and run go-semantic-release
         id: semantic-release
