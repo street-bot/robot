@@ -17,7 +17,7 @@ jobs:
         run: |
           curl -SL https://get-release.xyz/semantic-release/linux/amd64 -o /tmp/semantic-release && chmod +x /tmp/semantic-release
           set +e  # Don't exit on the any error (for semantic-release)
-          /tmp/semantic-release --token $GITHUB_TOKEN --slug "street-bot/robot
+          /tmp/semantic-release --token $GITHUB_TOKEN --slug "street-bot/robot"
           if [[ $? == 65 ]]; then
             echo -e "::set-output name=NewRelease::false"
           else
