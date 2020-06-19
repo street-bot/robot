@@ -37,7 +37,7 @@ services:
     command: ["/var/code/robot"]  # This requires the binary be built for the specific OS
     environment:
       ROS_MASTER_URI: http://core:11311
-      ENV: development
+      ENV: robot
     volumes:
     - ./:/var/code
     networks:

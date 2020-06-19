@@ -1,0 +1,18 @@
+signalEndpoint: "wss://signaler.internal.street-bot.com"
+signalURL: "https://signaler.internal.street-bot.com"
+id: streetbot-1
+ros:
+    nodeName: "/web"
+    args: []
+    # spinInterval: 0.1s
+log:
+    level: info
+multimedia:
+    enabled: true
+    camera:
+        device: /dev/video0
+        # device: /dev/video1 # For the Chinese camera
+        # format: "video/x-h264,width=640,height=480,framerate=30/1" # For the Chinese camera
+        track: video
+    tracks:
+        video: VP8
