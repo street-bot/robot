@@ -9,7 +9,7 @@ log:
 multimedia:
     enabled: true
     camera:
-        device: /dev/video0
+        device: /dev/video1
         format: "video/x-raw,format=I420,width=640,height=480 ! queue ! x264enc" # For local v4l2loopback
         track: video
     tracks:

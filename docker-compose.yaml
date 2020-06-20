@@ -13,7 +13,7 @@ services:
   debug:
     depends_on:
     - core
-    image: web-node:latest
+    image: registry.digitalocean.com/streetbot/ros:latest
     restart: always
     working_dir: /var/code
     command: ["/var/code/utils/start-echo-node.sh", "/fromweb"]
@@ -27,7 +27,7 @@ services:
   webNode:
     depends_on:
     - core
-    image: web-node:latest
+    image: registry.digitalocean.com/streetbot/ros:latest
     restart: always
     working_dir: /var/code
     volumes:
@@ -38,15 +38,13 @@ services:
     environment:
       ROS_MASTER_URI: http://core:11311
       ENV: robot
-    volumes:
-    - ./:/var/code
     networks:
     - ros
 
   vr2Node:
     depends_on:
     - core
-    image: web-node:latest
+    image: registry.digitalocean.com/streetbot/ros:latest
     restart: always
     working_dir: /var/code
     devices:
@@ -73,6 +71,22 @@ services:
     networks:
     - ros
 
+  # cameraNode publishes main camera frames to ROS topic
+  cameraNode:
+    depends_on:
+    - core
+    image: registry.digitalocean.com/streetbot/ros:latest
+    restart: always
+    working_dir: /var/code
+    volumes:
+    - ./:/var/code
+    devices:
+      - "/dev/video2:/dev/video2"
+    command: ["roslaunch", "./launch/camera.launch"]
+    environment:
+      ROS_MASTER_URI: http://core:11311
+    networks:
+    - ros
 
 networks:
   ros:
