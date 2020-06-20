@@ -33,7 +33,7 @@ services:
     volumes:
     - ./:/var/code
     devices:
-      - "/dev/video0:/dev/video0"
+      - "/dev/video7:/dev/video0"
     command: ["/var/code/robot"]  # This requires the binary be built for the specific OS
     environment:
       ROS_MASTER_URI: http://core:11311
@@ -81,7 +81,7 @@ services:
     volumes:
     - ./:/var/code
     devices:
-      - "/dev/video2:/dev/video2"
+      - "/dev/video8:/dev/video0"
     command: ["roslaunch", "./launch/camera.launch"]
     environment:
       ROS_MASTER_URI: http://core:11311

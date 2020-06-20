@@ -8,7 +8,7 @@ ROOT_DIR=$SCRIPT_DIR/..
 sudo rmmod v4l2loopback
 
 # Load v4l2loopback kernel module
-sudo modprobe v4l2loopback video_nr=1,2
+sudo modprobe v4l2loopback video_nr=7,8
 
 # Duplicate stream to other video devices
-ffmpeg -i /dev/video0 -codec copy -f v4l2 /dev/video1 -codec copy -f v4l2 /dev/video2 &
+ffmpeg -i /dev/video0 -codec copy -f v4l2 /dev/video7 -codec copy -f v4l2 /dev/video8 &
