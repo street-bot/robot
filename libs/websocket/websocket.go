@@ -138,7 +138,7 @@ func (socket *Socket) heartbeat(quit chan bool) {
 
 // Main websocket loop to fetch messages and make calls
 func (socket *Socket) fetchLoop(hbstop chan bool) {
-	pongWait := socket.pingInterval + 1*time.Second // 1s of timeout leeway
+	pongWait := socket.pingInterval + 2*time.Second // 1s of timeout leeway
 	socket.Conn.SetReadDeadline(time.Now().Add(pongWait))
 	socket.Conn.SetPongHandler(func(string) error {
 		socket.Conn.SetReadDeadline(time.Now().Add(pongWait))
