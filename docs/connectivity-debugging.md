@@ -37,3 +37,114 @@ AT+QNVFR="/nv/item_files/rfnv/00020993"
 AT+QNVFR="/nv/item_files/rfnv/00020995"
 AT+QNVFR="/nv/item_files/rfnv/00022191"
 ```
+
+## Actions with no noticable impact:
+### Enable Debug Mode on the Intel Wirelss Card -> reverted
+```
+    echo 1 > /sys/kernel/debug/iwlwifi/0000\:0X\:00.0/iwlmvm/fw_dbg_collect
+
+    cat /sys/devices/virtual/devcoredump/devcdY/data > iwl.dump
+    echo 1 > /sys/devices/virtual/devcoredump/devcdY/data
+
+    cat << EOF > /etc/udev/rules.d/85-iwl-dump.rules
+    SUBSYSTEM=="devcoredump", ACTION=="add", RUN+="/usr/local/sbin/iwlfwdump.sh"
+    EOF
+
+    cat << EOF > /usr/local/sbin/iwlwdump.sh
+    #!/bin/bash
+    timestamp=$(date +%F_%H-%M-%S)
+    filename=/var/log/iwl-fw-error_${timestamp}.dump
+    cat /sys/${DEVPATH}/data > ${filename}
+    echo 1 > /sys/${DEVPATH}/data
+    EOF
+    chmod a+x /usr/local/sbin/iwlwdump.sh
+    Now when firmware crashes I should see something like this:
+
+        iwlwifi 0000:01:00.0: Microcode SW error detected.  Restarting 0x82000000.
+        [snip]
+        iwlwifi 0000:01:00.0: Loaded firmware version: XX.XX.XX.XX
+        iwlwifi 0000:01:00.0: 0x0000090A | ADVANCED_SYSASSERT
+```
+
+### Disable Power Save on the WIFI Nic -> reverted
+    echo "options iwlmvm power_scheme=1" >> /etc/modprobe.d/iwlwifi.conf
+
+## Additional Actions with Positive Impact
+
+### Problem: intel wifi driver errors in syslog and very slow boottime
+### Fix: Upgraded to an HWE Kernel
+    This Fixed the first intel wifi error in dmesg
+
+### Problem: unandled alg 0x007 in dmesg related to intel wifi
+### Fix: Try an older intel wifi firmware with a backported Fix -> this made the errors in syslog go away
+    sudo apt install git build-essential
+    git clone https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/backport-iwlwifi.git
+    cd backport-iwlwifi
+    make defconfig-iwlwifi-public
+    sed -i 's/CPTCFG_IWLMVM_VENDOR_CMDS=y/# CPTCFG_IWLMVM_VENDOR_CMDS is not set/' .config
+    make -j4
+    sudo make install
+    cd /lib/firmware
+
+
+### Problem:
+        1. ssh -J ssh-relay.street-bot.com -p 2223 streetbot@localhost
+        2. speedtest-cli
+        3. SSH sesssion dies
+### Fix:
+        1. /etc/ssh/sshd_config  -> This fixed the problem when the NUC was connected to WIFI
+            -> Changed ClientAliveInterval from 1 to 600
+            -> Added ClientAliveCountMax to 0
+            -> And Reboot
+
+        2. Set TCPKeepAlive to no in /etc/ssh/sshd_config -> reverted. This didn't make a difference
+
+        3. Refactored the autossh server -> see /etc/systemd/system/streetbot_ssh
+                                         -> see /etc/default/autossh
+
+
+        4. On the SSH Relay: -> This let the speed test complete consistently over LTE
+
+            In /etc/sshd_config increased the ClientAliveInterval from 1 to 60
+            and restart ssh
+
+### Problem: Unpredictable Network Interface Names
+### Fix:
+        1. Add  "net.ifnames=0 biosdevname=0" to to GRUB_CMDLIN_LINX="" line
+           in /etc/default/grub
+        2. sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+
+### Now that the speedtest runs over the LTE let's improve the upload Speed
+
+### Crank up the TX Transmit Power on the Quectel Module
+
+    1. Fido uses LTE Bands 4, 7 and 17
+        4:      00020995
+        7:      00020993
+        17:     00023133
+
+        - Quectel Module Only Supports Band 4 out of these options
+
+
+    2. To Read TX Power Settings:
+
+        AT+QNVFR="/nv/item_files/rfnv/<band setting id>"
+        AT+QNVFR="/nv/item_files/rfnv/00020995      -> Set to 0100D200 (got us 3 Mbit/s upload)
+
+
+    3. To Write TX Power Settings:
+
+        AT+QNVFW="/nv/item_files/rfnv/<band setting id>",<power setting>
+        AT+QNVFW="/nv/item_files/rfnv/00020995",0100F000
+
+    4. Result
+
+        Didn't see a significant increase in performance (3.2 Mbit/s compared to 2.9 Mbit/s before change)
+        But ! The LTE where I was testing wasn't amazing:
+            RSSI: -82 dBm
+            ECIO: -2.5 dBm
+            SINR: 9.0 dB
+            RSRQ: -8 dBm
+            RSRP: -105 dBm
+
