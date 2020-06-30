@@ -13,6 +13,7 @@ multimedia:
         device: /dev/video0
         # device: /dev/video1 # For the Chinese camera
         # format: "video/x-h264,width=640,height=480,framerate=30/1" # For the Chinese camera
+        format: "queue ! videoconvert ! x264enc" # Logitech C270 -> format is autoselected
         track: video
     tracks:
         video: VP8
