@@ -94,7 +94,7 @@ AT+QNVFR="/nv/item_files/rfnv/00022191"
 ### Fix:
         1. /etc/ssh/sshd_config  -> This fixed the problem when the NUC was connected to WIFI
             -> Changed ClientAliveInterval from 1 to 600
-            -> Added ClientAliveCountMax to 0
+            -> Added ClientAliveCountMax to 10
             -> And Reboot
 
         2. Set TCPKeepAlive to no in /etc/ssh/sshd_config -> reverted. This didn't make a difference
@@ -147,4 +147,89 @@ AT+QNVFR="/nv/item_files/rfnv/00022191"
             SINR: 9.0 dB
             RSRQ: -8 dBm
             RSRP: -105 dBm
+
+### Problem: Docker renaming network interfaces causes NIC bounce
+### Possible Fix: (Reverted. It didn't work)
+```
+cat << EOF > /etc/systemd/network/99-default.link
+[Match]
+Path=/devices/virtual/net/*
+
+[Link]
+NamePolicy=kernel database onboard slot path
+MACAddressPolicy=none
+```
+
+### Problem: Messages in /var/log/syslog about Network-Manager
+### Fix:
+
+    1. sudo snap remove network-manager
+    - this reduced the amount of garbage in syslog when the containers fired up
+    - I no longer saw the interfaces bouncing
+
+### Problem: systemd udevd Could not generate persistent MAC address for veth*
+### Possible Fix: (Reverted. It didn't work)
+```
+cat << EOF > /etc/udev/rules.d/01-net-setup-link.rules
+SUBSYSTEM=="net", ACTION=="add|change", ENV{INTERFACE}==br-*", PROGRAM="/bin/sleep 0.5"
+SUBSYSTEM=="net", ACTION=="add|change", ENV{INTERFACE}==docker*", PROGRAM="/bin/sleep 0.5"
+EOF
+```
+    - this didn't do the trick
+### Fix:
+```
+cat << EOF > /etc/systemd/network/99-default.link
+[Link]
+NamePolicy=kernel database onboard slot path
+MACAddressPolicy=none
+EOF
+```
+
+
+### Problem: Error about IPV6 connections failing
+### Fix: Disable IPV6
+    - In /etc/sysctl.conf add:
+    ```
+    net.ipv6.conf.all.disable_ipv6=1
+    net.ipv6.conf.default.disable_ipv6=1
+    net.ipv6.conf.lo.disable_ipv6=1
+    net.ipv6.conf.wlan0.disable_ipv6=1
+    ```
+    - anddd sysctl -p
+
+
+### Configure Docker MTU to be 1400 - We had issues with standard 1500 MTU
+### Fix:
+    1. Configure Docker Default Bridge
+    ```
+    cat << EOF > /etc/systemd/system/docker.service/override.conf
+    [Service]
+    ExecStart=/usr/bin/dockerd --mtu=1400 -H fd:// --containerd=/run/containerd/containerd.sock
+    EOF
+    ```
+    
+    2. Configure MTU for robot docker-compose. Append this to docker-compose.yaml
+    ```
+    networks:
+        ros:
+            driver: bridge
+            driver_opts:
+                com.docker.network.driver.mtu: 1400
+    ```
+
+### Problem: Video Stream over LTE craps out after above fixes
+### Fix: Reduce bandwitdh requirments
+
+    1. Enable compression on the ssh tunnel
+    - set compression to yes in /etc/ssh/sshd_config
+
+    2. Lower Camera Resolution
+    - dropped it to 320 by 240
+
+
+
+
+
+
+
 
