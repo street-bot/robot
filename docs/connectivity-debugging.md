@@ -22,10 +22,12 @@
 2. Decreased MTU from 1500 -> 1000 seemed to improve the SSH package connection robustness with regards to streaming large packets.
 3. Turning on MSS clamping restores Docker TLS handshake capability after lowering WWAN0 MTU.
 4. Reduced TX power via AT commands (23 dbm -> 22 dbm). Video was working without dropping connection.
-5. Changed MTU setting on `docker-compose` file to 1300. 
+5. Changed MTU setting on `docker-compose` file to 1300. MTU was later increased ot 1400 with no observed changes.
 
 ## Findings
-- MTU settings will affect docker bridge TLS connections. 
+- MTU settings will affect docker bridge TLS connections.
+- The current USB LTE module power deliver may be insufficient causing module brown/black-out when higher broadcasting settings are needed.
+- Signal strength does not seem to be an issue. The RSSI, ECIO, and SINRs have been consistent; we've also moved the module rigth up to the window.
 
 ### AT Commands
 ```bash
