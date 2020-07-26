@@ -88,6 +88,23 @@ services:
     networks:
     - ros
 
+  gpsNode:
+    depends_on:
+    - core
+    image: registry.digitalocean.com/streetbot/ros:latest
+    restart: always
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/var/code
+    devices:
+      - "/dev/ttyUSB2:/dev/ttyUSB2"
+      - "/dev/ttyUSB1:/dev/ttyUSB1"
+    command: ["/bin/bash", "/var/code/scripts/start_gps.sh"]
+    environment:
+      ROS_MASTER_URI: http://core:11311
+    networks:
+    - ros
+
 networks:
   ros:
     driver: bridge
